@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>p01cs_casa</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+              crossorigin="anonymous">
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+        
+    </head>
+    <body>
+        <div class="container">
+            <h2>Ingrese 2 números del 1 al 100</h2>
+            <!--<button type="button" name="enviar" value="Enviar" id="llenar" class="btn btn-success" >Enviar</button>-->
+            <form id="form" action="/p01cs_casa/table" method="GET">
+                <div id="divAncho" class="form-group">
+                    <label for="ancho">Ancho</label>
+                    <input id="ancho" type="text" class="form-control" name="ancho"><!-- required -->
+                </div>	
+                <div id="divAlto" class="form-group">
+                    <label for="alto">Alto</label>
+                    <input id="alto" type="text" class="form-control" name="alto"><!-- required -->
+                </div>
+                <input id="btn" type="button" class="btn btn-primary" value="Enviar" name="enviar">
+
+
+            </form>
+            <hr>
+            <div id="alerta" class="alert alert-success"></div>
+            <div id="error" class="alert alert-danger" ></div>
+        </div>
+        <script>
+            
+            function esEntero(num){
+                var exReg=/^\d*$/;
+                if(exReg.test(num) &&  (num>0 && num<101)){
+                   return true; 
+                }else{
+                    return false;
+                }
+            }
+            console.log(esEntero(125));
+            console.log($('#ancho').val());
+            $(document).ready(function () {
+                
+                $('#btn').prop('disabled', true);
+                
+                $('#ancho').keydown(function(){
+                    if(!esEntero($('#ancho').val())){
+                        $('#divAncho').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    }else{
+                       $('#btn').prop('disabled', false);
+                       $("#error").empty();
+                    }
+                });
+                $('#alto').keydown(function(){
+                    if(!esEntero($('#alto').val())){
+                        $('#divAlto').addClass("has-error");
+                        $("#error").empty().append("Introduzca un número del 1 al 100");
+                        $("#alerta").empty();
+                    }else{
+                       $('#btn').prop('disabled', false);
+                       $("#error").empty();
+                    }
+                });
+                
+                   
+                
+               $("#btn").click(function () {
+
+                    $.ajax({
+                        url: $("#form").attr("action"), //"/p01cs_casa/table",
+                        cache: false,
+                        method: $("#form").attr("method"), //"get",
+                        data: $("#form").serialize(),
+                        dataType: "json",
+                        success: function (data) {
+
+                            var arrayLength = data.length;
+                            var s = '<table class="table">';
+                            for (i = 0; i < arrayLength; i++) {
+                                s += "<tr>";
+
+                                var arrayLength2 = data[i].array.length;
+                                for (j = 0; j < arrayLength2; j++) {
+
+                                    s += "<td>" + data[i].array[j].resultado + "</td>";
+                                }
+                                s += "</tr>";
+
+                            }
+                            s += "</table>";
+                            $("#alerta").empty().append(s);
+                            $("#error").empty();
+                        },
+                        error: function (data) {
+                            //var cadena=JSON.stringify(data);
+
+
+                            var msj = "Mensaje del servidor: " + data.responseJSON.mensaje + "</br> Alto: "
+                                    + data.responseJSON.alto + "</br>Ancho: " + data.responseJSON.ancho;
+
+                            $("#error").empty().append("Ha habido un error. Por favor, intentelo de nuevo</br>" + msj);
+                            $("#alerta").empty();
+
+                        }
+
+                    });
+                });
+
+
+
+
+
+
+            });
+
+        </script>
+    </body>
+</html>
